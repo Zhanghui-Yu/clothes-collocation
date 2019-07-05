@@ -1,0 +1,10 @@
+use mardrobe;
+CREATE TABLE `users` (
+  `uid` int(11) NOT NULL AUTO_INCREMENT,
+  `account` varchar(45) NOT NULL,
+  `password` varchar(45) Not NULL,
+  `phone` varchar(45) DEFAULT NULL,
+  `role` varchar(45) default "customer",
+  `state` varchar(45) default "permit",
+  PRIMARY KEY (`uid`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
