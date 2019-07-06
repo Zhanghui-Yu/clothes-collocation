@@ -1,0 +1,252 @@
+import React, { Component } from 'react';
+import http from "./http";
+import {
+    StyleSheet,
+    Text,
+    View,
+    TouchableOpacity,
+    TextInput,
+    Alert,
+    Button,
+    Image,
+    Animated,
+    ImageBackground,
+    ScrollView
+} from 'react-native';
+class FadeInView extends React.Component {
+  state = {
+    fadeAnim: new Animated.Value(0),  // 透明度初始值设为0
+  }
+
+  componentDidMount() {
+    Animated.timing(                  // 随时间变化而执行动画
+      this.state.fadeAnim,            // 动画中的变量值
+      {
+        toValue: 1,                   // 透明度最终变为1，即完全不透明
+        duration: 5000,              // 让动画持续一段时间
+      }
+    ).start();                        // 开始执行动画
+  }
+
+  render() {
+    let { fadeAnim } = this.state;
+
+    return (
+      <Animated.View                 // 使用专门的可动画化的View组件
+        style={{
+          ...this.props.style,
+          opacity: fadeAnim,         // 将透明度指定为动画变量值
+        }}
+      >
+        {this.props.children}
+      </Animated.View>
+    );
+  }
+}
+export default class ThirdPage extends Component<Props> {
+
+
+    username = '';  //保存用户名
+        password = '';  //保存密码
+        userdata = '';
+        /**
+         * 当用户名输入框值改变时，保存改变的值
+         * @param  {[type]} newUsername [输入的用户名]
+         */
+        onUsernameChanged = (newUsername) => {
+            console.log(newUsername);//运行后可以在输入框随意输入内容并且查看log验证！
+            this.username = newUsername;
+        };
+
+        /**
+         * 当密码输入框值改变时，保存改变的值
+         * @param  {[type]} newUsername [输入的密码]
+         */
+        onPasswordChanged = (newPassword) => {
+            console.log(newPassword);//运行后可以在输入框随意输入内容并且查看log验证！
+            this.password = newPassword;
+        };
+ /**
+     * 点击空白处使输入框失去焦点
+     */
+    blurTextInput = () => {
+        this.refs.username.blur();
+        this.refs.password.blur();
+    }
+    login = () => {
+    let uid=0;
+    let value={
+    account:this.username,
+    password:this.password
+    }
+     http.post('http://192.168.137.1:8762/findUser', value)
+                .then(function (data){
+                uid=data.uid;
+
+                 if (uid!=-1) {
+                               // this.refs.username.blur();
+                                //this.refs.password.blur();
+                                window.alert("登录成功");  //弹出提示框
+
+                            } else {
+                               window.alert("登录失败,用户名或密码不正确");  //弹出提示框
+                                   };
+                 }
+                )
+                .catch(err => console.log(err))
+
+
+
+
+
+        };
+/**
+     * 注册按钮，点击进入注册界面
+     */
+    register = () => {
+        this.props.navigation.navigate('Page2');  //跳转到注册过的Register界面
+    }
+
+
+    render() {
+        const { navigate } = this.props.navigation;
+        return (
+           <ScrollView>
+            <ImageBackground style={{ flex: 1 }}
+                             source={require('../img/background.jpg')}>
+
+       <View style={{flex: 1,alignItems: 'center', justifyContent: 'center' }}>
+        <FadeInView style={styles.titleBackground}>
+                                          <Text style={styles.title}>登录</Text>
+                              </FadeInView>
+        <TouchableOpacity  //用可点击的组件作为背景
+                        activeOpacity={1.0}  //设置背景被点击时的透明度改变值
+                        onPress={this.blurTextInput}  //添加点击事件
+                        style={styles.container}>
+                        <View
+                            style={styles.inputBox1}>
+                            <TextInput
+                                ref="username"  //设置描述
+                                onChangeText={this.onUsernameChanged}  //添加值改变事件
+                                style={styles.input}
+                                autoCapitalize='none'  //设置首字母不自动大写
+                                underlineColorAndroid={'transparent'}  //将下划线颜色改为透明
+                                placeholderTextColor={'#ccc'}  //设置占位符颜色
+                                placeholder={'用户名'}  //设置占位符
+                            />
+                        </View>
+                        <View
+                            style={styles.inputBox}>
+                            <TextInput
+                                ref="password"  //设置描述
+                                onChangeText={this.onPasswordChanged}  //添加值改变事件
+                                style={styles.input}
+                                autoCapitalize='none'  //设置首字母不自动大写
+                                underlineColorAndroid={'transparent'}  //将下划线颜色改为透明
+                                secureTextEntry={true}  //设置为密码输入框
+                                placeholderTextColor={'#ccc'}  //设置占位符颜色
+                                placeholder={'密码'}  //设置占位符
+                            />
+                        </View>
+                        <TouchableOpacity
+                            onPress={this.login} //添加点击事件
+                            style={styles.button}>
+                            <Text
+                                style={styles.btText}>登录</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={()=>this.register()}
+                            style={styles.button}>
+                            <Text
+                                style={styles.btText}>注册</Text>
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                     <Image
+                                                      source={require('../img/test4.png')}
+                                                      style={styles.thumbnail}
+                                                      />
+</View>
+ </ImageBackground>
+</ScrollView>
+        );
+    }
+}
+
+const styles = StyleSheet.create({
+
+   titleBackground:{
+   width: 400,
+   height: 50,
+   backgroundColor:  '#4682B4'
+   },
+   title:{
+   fontSize: 28,
+   textAlign: 'center',
+   margin: 10
+   },
+    welcome: {
+        fontSize: 20,
+        textAlign: 'center',
+        margin: 10,
+    },
+    textView: {
+        fontSize: 16,
+        textAlign: 'center',
+        margin: 10,
+        color:'red'
+    },
+    container: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor:'rgba(187,255,255,0)',
+        },
+        input: {
+            width: 200,
+            height: 40,
+            fontSize: 20,
+            color: '#000000'
+        },
+        inputBox: {
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: 280,
+            height: 50,
+            borderRadius: 8,
+            backgroundColor: '#F0FFFF',
+            marginBottom: 8,
+        },
+        inputBox1: {
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: 280,
+                    height: 50,
+                    borderRadius: 8,
+                    backgroundColor: '#F0FFFF',
+                    marginBottom: 8,
+                     marginTop: 40
+                },
+        button: {
+            height: 50,
+            width: 280,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 8,
+            backgroundColor: '#4682B4',
+            marginTop: 20
+        },
+        btText: {
+            color: '#fff',
+            fontSize: 20,
+        },
+thumbnail: {
+        width: 545/6,
+        height: 765/6,
+        alignSelf:"center",
+        marginTop: 80,
+        marginBottom: 200
+      },
+
+});
