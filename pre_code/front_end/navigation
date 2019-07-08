@@ -1,0 +1,190 @@
+import React, { Component } from 'react';
+import {
+    StyleSheet,
+    Text,
+    View,
+    Image,
+    Animated,
+    TouchableOpacity,
+    ImageBackground,
+    ScrollView,
+    ListView,
+    Dimensions
+} from 'react-native';
+import BottomNavigation from './BottomNavigation';
+class Blink extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { isShowingText: true };
+
+    // 每1000毫秒对showText状态做一次取反操作
+    setInterval(() => {
+      this.setState(previousState => {
+        return { isShowingText: !previousState.isShowingText };
+      });
+    }, 1000);
+  }
+
+  render() {
+    // 根据当前showText的值决定是否显示text内容
+    if (!this.state.isShowingText) {
+      return null;
+    }
+
+    return (
+      <Text>{this.props.text}</Text>
+    );
+  }
+}
+
+class FadeInView extends React.Component {
+  state = {
+    fadeAnim: new Animated.Value(0),  // 透明度初始值设为0
+  }
+
+  componentDidMount() {
+    Animated.timing(                  // 随时间变化而执行动画
+      this.state.fadeAnim,            // 动画中的变量值
+      {
+        toValue: 1,                   // 透明度最终变为1，即完全不透明
+        duration: 10000,              // 让动画持续一段时间
+      }
+    ).start();                        // 开始执行动画
+  }
+
+  render() {
+    let { fadeAnim } = this.state;
+
+    return (
+      <Animated.View                 // 使用专门的可动画化的View组件
+        style={{
+          ...this.props.style,
+          opacity: fadeAnim,         // 将透明度指定为动画变量值
+        }}
+      >
+        {this.props.children}
+      </Animated.View>
+    );
+  }
+}
+
+export default class FirstPage extends Component {
+
+    render() {
+        const { navigate } = this.props.navigation;
+        let MainHeight = Dimensions.get('window').height;
+        return (
+
+        <ImageBackground style={{ flex: 1}}
+                  source={require('../img/background.jpg')}>
+
+            <View>
+
+
+
+            <FadeInView style={{width: 250, height: 50, backgroundColor: 'powderblue'}}>
+                                    <Text style={{fontSize: 28, textAlign: 'center', margin: 10}}>Mardrobe</Text>
+                        </FadeInView>
+            <ScrollView style={{ height:MainHeight*0.8}}>
+
+            <View style={{flex: 1, flexDirection: 'row',height: 20}}>
+
+                            <TouchableOpacity
+                                onPress={()=>{
+                                    navigate('Register',{message:'Register'});
+                                }}
+                            >
+                                <Text style={styles.textView}>
+                                    Register
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={()=>{
+                                    navigate('Login',{message:'Login'});
+                                }}
+                            >
+                                <Text style={styles.textView}>
+                                   Login
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={()=>{
+                                    navigate('BottomNavigation',{message:'BottomNavigation'});
+                                }}
+                            >
+                                <Text style={styles.textView}>
+                                    Browse
+                                </Text>
+                            </TouchableOpacity>
+                            </View>
+                            <View >
+                           <Image
+                                 source={require('../img/test1.jpg')}
+                                 style={styles.thumbnail}
+                                 />
+                           <Image
+                                  source={require('../img/test3.jpg')}
+                                  style={styles.thumbnail}
+                                  />
+                                   <Image
+                                                                   source={require('../img/test1.jpg')}
+                                                                   style={styles.thumbnail}
+                                                                   />
+                                </View>
+
+                       </ScrollView>
+
+            </View>
+            <BottomNavigation/>
+            </ImageBackground>
+
+
+        );
+    }
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F5FCFF',
+    },
+    welcome: {
+        fontSize: 20,
+        textAlign: 'center',
+        margin: 10,
+    },
+    textView: {
+        fontSize: 16,
+        textAlign: 'center',
+        margin: 10,
+        color:'red'
+    },
+    container: {
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#F5FCFF"
+      },
+      rightContainer: {
+        flex: 1
+      },
+      title: {
+        fontSize: 20,
+        marginBottom: 8,
+        textAlign: "center"
+      },
+
+      thumbnail: {
+        width: 120,
+        height: 170,
+        margin: 25,
+        alignSelf:"center"
+      },
+      list: {
+        paddingTop: 20,
+        backgroundColor: "#F5FCFF"
+      }
+});
