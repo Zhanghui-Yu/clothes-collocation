@@ -1,0 +1,173 @@
+import React, { Component } from "react";
+
+
+import {
+    StyleSheet,
+    Text,
+    View,
+    Image,
+    Animated,
+    TouchableOpacity,
+    ImageBackground,
+    ScrollView,
+    ListView,
+    Dimensions,
+    FlatList
+} from 'react-native';
+import TabNavigator from 'react-native-tab-navigator';
+
+class FadeInView extends React.Component {
+  state = {
+    fadeAnim: new Animated.Value(0),  // 透明度初始值设为0
+  }
+
+  componentDidMount() {
+    Animated.timing(                  // 随时间变化而执行动画
+      this.state.fadeAnim,            // 动画中的变量值
+      {
+        toValue: 1,                   // 透明度最终变为1，即完全不透明
+        duration: 10000,              // 让动画持续一段时间
+      }
+    ).start();                        // 开始执行动画
+  }
+
+  render() {
+    let { fadeAnim } = this.state;
+
+    return (
+      <Animated.View                 // 使用专门的可动画化的View组件
+        style={{
+          ...this.props.style,
+          opacity: fadeAnim,         // 将透明度指定为动画变量值
+        }}
+      >
+        {this.props.children}
+      </Animated.View>
+    );
+  }
+}
+export default class SampleAppMovies extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [],
+      selectedTab:'tb_contacts',
+    };
+
+this.tabNavigatorItems = this.tabNavigatorItems.bind(this);
+  }
+
+tabNavigatorItems(selectedTab,title,icon,selectedIcon,mark,viewContent,newPage){
+   let t=this;
+      return (
+          <TabNavigator.Item
+              selected={this.state.selectedTab === selectedTab }
+              title={title}
+              renderIcon={()=> <Image style={styles.myImage} source={icon}/> }
+              renderSelectedIcon={()=> <Image  style={styles.myImage} source={selectedIcon}/> }
+              badgeText={mark}
+              onPress={()=> {
+              this.setState({selectedTab:selectedTab  });
+              t.props.navigation.navigate(newPage,{message:'newPage'});
+
+
+              }
+               }>
+              <View style={{flex:1}}></View>
+          </TabNavigator.Item>
+      )
+  }
+
+
+
+  render() {
+
+let MainHeight = Dimensions.get('window').height;
+this.state={
+                selectedTab:'tb_contacts',
+              }
+    return (
+    <ImageBackground style={{ flex: 1}}
+                      source={require('../img/background.jpg')}>
+
+<FadeInView style={{width: 250, height: 50, backgroundColor: 'powderblue'}}>
+                                    <Text style={{fontSize: 28, textAlign: 'center', margin: 10}}>我的好友</Text>
+                        </FadeInView>
+      <FlatList
+        data = {[
+                      {key: 'Java'},
+                      {key: 'Android'},
+                      {key: 'iOS'},
+                      {key: 'Flutter'},
+                      {key: 'React Native'},
+                      {key: 'Kotlin'},
+                    ]}
+        renderItem={this.renderMovie}
+        style={{paddingTop: 20,
+                    backgroundColor: "#F5FCFF",height:MainHeight*0.4}}
+        keyExtractor={item => item.id}
+      />
+      <View style={{flex: 1,backgroundColor: '#F5FCFF',height:MainHeight*0.2}}>
+                          <TabNavigator>
+                             {this.tabNavigatorItems('tb_msg',"主页",require('../img/main.png'),require('../img/mains.png'),"","消息页面内容",'Main')}
+                             {this.tabNavigatorItems('tb_contacts',"好友",require('../img/friend.png'),require('../img/friends.png'),"","联系人页面内容",'Friend')}
+                             {this.tabNavigatorItems('tb_watch',"搭配推荐",require('../img/match2.png'),require('../img/match1.png'),"","看点页面内容",'Match')}
+                             {this.tabNavigatorItems('tb_dynamic',"我的衣柜",require('../img/clothes1.png'),require('../img/clothes.png'),"","动态页面内容",'Clothes')}
+                             {this.tabNavigatorItems('tb_dyn',"消息",require('../img/message.png'),require('../img/messages.png'),"1","动态页面内容",'Message')}
+                          </TabNavigator>
+                       </View>
+
+                        </ImageBackground>
+    );
+  }
+
+
+
+  renderMovie({ item }) {
+    // { item }是一种“解构”写法，请阅读ES2015语法的相关文档
+    // item也是FlatList中固定的参数名，请阅读FlatList的相关文档
+    return (
+      <View style={styles.container}>
+        <Image
+          source={require('../img/6.png')}
+          style={styles.thumbnail}
+        />
+        <View style={styles.rightContainer}>
+          <Text style={styles.username}>smallqqq</Text>
+          <Text style={styles.dynamic}>我是沙雕</Text>
+        </View>
+      </View>
+    );
+  }
+}
+
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5FCFF"
+  },
+  rightContainer: {
+    flex: 1
+  },
+  username: {
+    fontSize: 15,
+    marginBottom: 5,
+
+  },
+  dynamic: {
+   fontSize: 10
+  },
+  thumbnail: {
+    width: 40,
+    height: 40,
+    margin:5,
+    marginLeft:20
+  },
+  myImage:{
+                width:24,
+                height:22,
+            }
+});
