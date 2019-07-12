@@ -5,6 +5,7 @@ import com.example.usermanage.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import net.sf.json.JSONObject;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -22,7 +23,7 @@ public class UserController {
         String account = request.getParameter("account");
         String password = request.getParameter("password");
         response.setHeader("Access-Control-Allow-Origin", "*");
-        User tmp = userService.findByAccountAndPassword(account,password);
+        User tmp = userService.findByAccountAndPassword(account, password);
         System.out.println(account);
         System.out.println(password);
         return tmp;
@@ -32,7 +33,6 @@ public class UserController {
     @ResponseBody
     public List<User> findAllCustomer(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
-        System.out.println(1);
         return userService.findAllCustomers();
     }
 
@@ -42,6 +42,7 @@ public class UserController {
         response.setHeader("Access-Control-Allow-Origin", "*");
         userService.updateState(Integer.parseInt(request.getParameter("uid")));
     }
+
 
     @PostMapping(value = "/addUser", produces = "application/json;charset=UTF-8")
     @ResponseBody
@@ -53,14 +54,11 @@ public class UserController {
         response.setHeader("Access-Control-Allow-Origin", "*");
         User tmp = userService.findByAccount(account);
         System.out.println(1);
-        if(tmp == null) {
-            System.out.println(1);
-            userService.addUser(account,password,email);
-            System.out.println(1);
+        if (tmp == null) {
+            userService.addUser(account, password, email);
             return 1;
-        }
-        else
-            return  -1;
+        } else
+            return -1;
     }
-    
+
 }
