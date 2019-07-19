@@ -1,6 +1,7 @@
 package com.example.messagemanage.controller;
 
 import com.example.messagemanage.entity.Message;
+import com.example.messagemanage.service.FeignService;
 import com.example.messagemanage.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,25 +16,35 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-
-    @GetMapping(value = "/findMessage", produces = "application/json;charset=UTF-8")
+    @PostMapping(value = "/findMessages", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public List<Message> findMessage(HttpServletRequest request, HttpServletResponse response) {
-        System.out.println(1);
+    public List<Message> findMessages(HttpServletRequest request, HttpServletResponse response) {
         String recipient = request.getParameter("recipient");
         response.setHeader("Access-Control-Allow-Origin", "*");
         return messageService.findByRecipient(recipient);
     }
 
-    @GetMapping(value = "/addMessage", produces = "application/json;charset=UTF-8")
+    @PostMapping(value = "/manageInvitation", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public void addMessage(HttpServletRequest request, HttpServletResponse response) {
-        System.out.println(1);
+    public int manageInvitation(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        String id = request.getParameter("id");
+        int flag = Integer.parseInt(request.getParameter("flag"));
+        return messageService.manageInvitation(id,flag);
+    }
+
+    @PostMapping(value = "/addMessage", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public int addMessage(HttpServletRequest request, HttpServletResponse response) {
         String sender = request.getParameter("sender");
         String recipient = request.getParameter("recipient");
         String content = request.getParameter("content");
         String time = request.getParameter("time");
         response.setHeader("Access-Control-Allow-Origin", "*");
-        messageService.addMessage(sender,recipient,content,time);
+        if(content.equals(""))
+            messageService.addInvitation(sender,recipient,time);
+        else
+            messageService.addMessage(sender,recipient,content,time);
+        return 1;
     }
 }

@@ -21,6 +21,13 @@ public class Message {
         this.content = content;
         this.time = time;
     }
+
+    public Message(String sender, String recipient, String time) {
+        this.sender = sender;
+        this.recipient = recipient;
+        this.time = time;
+    }
+
     public String getId() {
         return this.id;
     }
