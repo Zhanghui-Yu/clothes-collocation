@@ -1,0 +1,215 @@
+import React, { Component } from 'react';
+import http from "./http";
+import {
+    StyleSheet,
+    Text,
+    View,
+    TouchableOpacity,
+    TextInput,
+    Alert,
+    Button,
+    Image,
+    Animated,
+    ImageBackground,
+    ScrollView,
+    AsyncStorage
+} from 'react-native';
+import head from './head';
+import DeviceStorage from './DeviceStorage';
+export default class ThirdPage extends Component<Props> {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            head: ''
+        }
+
+    }
+
+    onHeadSelect(num) {
+        this.setState({ head: num })
+
+    };
+    onHeadChanged = () => {
+        let t = this;
+        DeviceStorage.get('login').then((login) => {
+            let value = {
+                uid: login,
+                picture: t.state.head
+            }
+            http.post('http://192.168.137.1:8762/updatePicture', value)
+                .then(function (data) {
+                    DeviceStorage.save('headid', t.state.head);
+                    window.alert('修改成功！');
+                    t.props.navigation.navigate('Main', { message: 'Main' });
+                })
+
+        });
+    };
+
+
+
+
+    componentWillMount() {
+        DeviceStorage.get('headid').then((headid) => {
+            this.setState({ head: headid })
+        });
+    };
+    render() {
+        const { navigate } = this.props.navigation;
+        return (
+            <ImageBackground style={{ flex: 1 }} source={require('../img/background.jpg')}>
+                <View>
+                    <View style={styles.titleBackground}>
+                        <Text style={styles.title}>更换头像</Text>
+                    </View>
+                    <View style={{ flexDirection: "row" }}>
+                        <Text style={{ marginTop: 30, marginLeft: 20 }}>我的头像：</Text>
+                        <Image style={styles.sculpture2}
+                            source={head['img' + this.state.head]}
+                        />
+                    </View>
+                    <Text style={{ marginTop: 30, marginLeft: 20 }}>选择新头像:</Text>
+                    <View style={{ flexDirection: "row", marginLeft: 20 }}>
+
+                        <TouchableOpacity onPress={this.onHeadSelect.bind(this, 0)} >
+                            <Image style={styles.sculpture2}
+                                source={head['img' + 0]}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={this.onHeadSelect.bind(this, 1)} style={{ marginLeft: 20 }}>
+                            <Image style={styles.sculpture2}
+                                source={head['img' + 1]}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={this.onHeadSelect.bind(this, 2)} style={{ marginLeft: 20 }}>
+                            <Image style={styles.sculpture2}
+                                source={head['img' + 2]}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={this.onHeadSelect.bind(this, 3)} style={{ marginLeft: 20 }}>
+                            <Image style={styles.sculpture2}
+                                source={head['img' + 3]}
+                            />
+                        </TouchableOpacity>
+                    </View>
+
+
+                    <View style={{ flexDirection: "row", marginLeft: 20 }}>
+
+                        <TouchableOpacity onPress={this.onHeadSelect.bind(this, 4)}>
+                            <Image style={styles.sculpture2}
+                                source={head['img' + 4]}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={this.onHeadSelect.bind(this, 5)} style={{ marginLeft: 20 }}>
+                            <Image style={styles.sculpture2}
+                                source={head['img' + 5]}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={this.onHeadSelect.bind(this, 6)} style={{ marginLeft: 20 }}>
+                            <Image style={styles.sculpture2}
+                                source={head['img' + 6]}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={this.onHeadSelect.bind(this, 7)} style={{ marginLeft: 20 }}>
+                            <Image style={styles.sculpture2}
+                                source={head['img' + 7]}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity onPress={this.onHeadChanged} style={styles.button}>
+                        <Text style={styles.btText}>确定</Text>
+                    </TouchableOpacity>
+                </View>
+            </ImageBackground>
+
+        );
+    }
+}
+
+const styles = StyleSheet.create({
+
+    titleBackground: {
+        width: 400,
+        height: 50,
+        backgroundColor: '#4682B4'
+    },
+    title: {
+        fontSize: 28,
+        textAlign: 'center',
+        margin: 10,
+        color: '#FFFFFF'
+    },
+    welcome: {
+        fontSize: 20,
+        textAlign: 'center',
+        margin: 10,
+    },
+    textView: {
+        fontSize: 16,
+        textAlign: 'center',
+        margin: 10,
+        color: 'red'
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(187,255,255,0)',
+    },
+    input: {
+        width: 200,
+        height: 40,
+        fontSize: 17,
+        color: '#000000',
+    },
+    inputBox: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 280,
+        height: 50,
+        borderRadius: 8,
+        backgroundColor: '#F0FFFF',
+        marginBottom: 8,
+    },
+    inputBox1: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 280,
+        height: 50,
+        borderRadius: 8,
+        backgroundColor: '#F0FFFF',
+        marginBottom: 8,
+        marginTop: 40
+    },
+    button: {
+        height: 50,
+        width: 280,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 8,
+        backgroundColor: '#4682B4',
+        marginTop: 20,
+        alignSelf: "center"
+    },
+    btText: {
+        color: '#fff',
+        fontSize: 20,
+    },
+    thumbnail: {
+        width: 545 / 6,
+        height: 765 / 6,
+        alignSelf: "center",
+        marginTop: 80,
+        marginBottom: 200
+    },
+    sculpture2: {
+        width: 55,
+        height: 55,
+        marginLeft: 5,
+        marginTop: 30
+    },
+});
