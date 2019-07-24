@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
     Platform,
     StyleSheet,
@@ -7,69 +7,201 @@ import {
     Image,
     Dimensions,
     TouchableOpacity,
-    FlatList
+    FlatList,
+    ImageBackground
 } from 'react-native';
+import head from './head';
+import http from "./http";
+import ImagePicker from 'react-native-image-picker';
+import DeviceStorage from './DeviceStorage';
 import SideMenu from 'react-native-side-menu';
 import TabNavigator from 'react-native-tab-navigator';
 import LinearGradient from 'react-native-linear-gradient';
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+const photoOptions = {
+    title: '请选择',
+    quality: 0.8,
+    cancelButtonTitle: '取消',
+    takePhotoButtonTitle: '拍照',
+    chooseFromLibraryButtonTitle: '选择相册',
+    allowsEditing: true,
+    noData: false,
+    storageOptions: {
+        skipBackup: true,
+        path: 'images'
+    }
+};
 type Props = {};
 export default class Side extends Component<Props> {
 
     constructor(props) {
         super(props);
         this.state = {
+            uid:'',
             isOpen: false,
-             selectedTab:'tb_dynamic'
+            head: '',
+            username: '',
+            picture: '',
+            clothes: [],
+            selectedTab: 'tb_dynamic'
         };
         this.tabNavigatorItems = this.tabNavigatorItems.bind(this);
+        this.choosePicker = this.choosePicker.bind(this);
+        this.renderMovie = this.renderMovie.bind(this);
     }
+    changehead = () => {
+        this.props.navigation.navigate('ChangeHead', { message: 'ChangeHead' });
+    }
+    changepassword = () => {
+        this.props.navigation.navigate('ChangePassword', { message: 'ChangePassword' });
+    }
+    changeinformation = () => {
+        this.props.navigation.navigate('ChangeInformation', { message: 'ChangeInformation' });
+    }
+    logout = () => {
+        let login = '';
+        DeviceStorage.save('login', login).then((tags) => {
+            window.alert('注销成功！')
+            this.props.navigation.navigate('Login', { message: 'Login' });
+        });
+    }
+    getmyDate() {
+        var date = new Date();
+        var year = date.getFullYear().toString();
+        var month = (date.getMonth() + 1).toString();
+        var day = date.getDate().toString();
+        var hour = date.getHours().toString();
+        var minute = date.getMinutes().toString();
 
-tabNavigatorItems(selectedTab,title,icon,selectedIcon,mark,viewContent,newPage){
-   let t=this;
-      return (
-          <TabNavigator.Item
-              selected={this.state.selectedTab === selectedTab }
-              title={title}
-              renderIcon={()=> <Image style={styles.myImage} source={icon}/> }
-              renderSelectedIcon={()=> <Image  style={styles.myImage} source={selectedIcon}/> }
-              badgeText={mark}
-              onPress={()=> {
-              this.setState({selectedTab:'tb_dynamic' });
-              this.setState({isOpen: false });
-              t.props.navigation.navigate(newPage,{message:'newPage'});
+        return year + '年' + month + '月' + day + '日' + ' ' + hour + ':' + minute;
+    };
+    show = () => {
+             let t = this;
+             let value = { uid: t.state.uid }
+             http.post('http://192.168.137.1:8763/findWardrobe', value)
+                 .then(function (data) {
+                     t.setState({ clothes: data });
+                 }
+                 )
+                 .catch(err => console.log(err))
+         }
+    addclothes = () => {
+        let t = this;
+        if (t.state.picture !== '') {
+            var date = this.getmyDate();
+             let value = {
+                 uid: t.state.uid,
+                 time:date,
+                 picture:t.state.picture.uri
+                  }
+             http.postimg('http://192.168.137.1:8763/addWardrobe', value)
+                  .then(function (data) {
+                        window.alert("添加成功！");
+                  }
+                  )
+                  .catch(err => console.log(err))
+             }
+         else window.alert("请选择图片！");
+    }
+    deleteclothes = (i) => {
+             let t = this;
+             let value = { id: i}
+             http.post('http://192.168.137.1:8763/deleteWardrobe', value)
+                 .then(function (data) {
+                     window.alert('删除成功！')
+                 }
+                 )
+                 .catch(err => console.log(err))
+         }
+    choosePicker() {
+        let t = this;
+        ImagePicker.showImagePicker(photoOptions, (response) => {
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            }
+            else if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            }
+            else if (response.customButton) {
+                console.log('User tapped custom button: ', response.customButton);
+            }
+            else {
+                // let source = { uri: response.uri };
+                // You can also display the image using data:
+                let source = { uri: 'data:image/jpeg;base64,' + response.data };
+                t.setState({
+                    picture: source
+                });
 
 
-              }
-               }>
-              <View style={{flex:1}}></View>
-          </TabNavigator.Item>
-      )
-  }
+            }
+        });
+    }
+    tabNavigatorItems(selectedTab, title, icon, selectedIcon, mark, viewContent, newPage) {
+        let t = this;
+        return (
+            <TabNavigator.Item
+                selected={this.state.selectedTab === selectedTab}
+                title={title}
+                renderIcon={() => <Image style={styles.myImage} source={icon} />}
+                renderSelectedIcon={() => <Image style={styles.myImage} source={selectedIcon} />}
+                badgeText={mark}
+                onPress={() => {
+                    this.setState({ selectedTab: 'tb_dynamic' });
+                    this.setState({ isOpen: false });
+                    t.props.navigation.navigate(newPage, { message: 'newPage' });
+                }}
+            >
+                <View style={{ flex: 1 }}></View>
+            </TabNavigator.Item>
+        )
+    }
+    componentWillMount() {
+        let t = this;
+        DeviceStorage.get('headid').then((headid) => {
+            this.setState({ head: headid })
+        });
+        DeviceStorage.get('username').then((username) => {
+            this.setState({ username: username })
+        });
+        DeviceStorage.get('login').then(function(uid){
+            t.setState({ uid: uid })
+            t.show();
+        });
 
+
+    }
     render() {
-
-        const menu =<View>
-                        <View style={styles.container2}>
-                              <TouchableOpacity onPress={() => alert("修改头像")}>
-                                    <Image style={styles.sculpture2}
-                                        source={require('../img/head_sculpture/6.png')}
-                                    />
-                              </TouchableOpacity>
-                              <Text style={{fontSize: 20, textAlign: 'center', marginLeft:25,marginTop:47}}
-                              >
-                                    smallqqq
-                              </Text>
-                        </View>
-                        <View style={styles.container4}>
-                               <TouchableOpacity onPress={() => alert("修改信息")}>
-                                    <Text style={{marginLeft:5,fontSize:30,marginTop:30}}>修改信息</Text>
-                               </TouchableOpacity>
-                               <TouchableOpacity onPress={() => alert("退出登录")}>
-                                      <Text style={{marginLeft:5,fontSize:30,marginTop:30}}>退出登录</Text>
-                                </TouchableOpacity>
-                        </View>
-                     </View>
+        let t = this;
+        const menu = <View>
+            <LinearGradient colors={['#6495ED', '#B0E0E6']} >
+                <View style={styles.container2}>
+                    <TouchableOpacity onPress={this.changehead}>
+                        <Image style={styles.sculpture2}
+                            source={head['img' + this.state.head]}
+                        />
+                    </TouchableOpacity>
+                    <Text style={{ fontSize: 20, textAlign: 'center', marginLeft: 25, marginTop: 47 }}
+                    >
+                        {this.state.username}
+                    </Text>
+                </View>
+            </LinearGradient>
+            <View style={{ height: 4 }}></View>
+            <LinearGradient colors={['#B0E0E6', '#6495ED']} >
+                <View style={styles.container4}>
+                    <TouchableOpacity onPress={this.changeinformation}>
+                        <Text style={{ marginLeft: 10, fontSize: 20, marginTop: 30, color: '#000000' }}>账号管理</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.changepassword}>
+                        <Text style={{ marginLeft: 10, fontSize: 20, marginTop: 30, color: '#000000' }}>修改密码</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.logout}>
+                        <Text style={{ marginLeft: 10, fontSize: 20, marginTop: 30, color: '#000000' }}>退出登录</Text>
+                    </TouchableOpacity>
+                </View>
+            </LinearGradient>
+        </View>
         return (
             <SideMenu
                 menu={menu}                    //抽屉内的组件
@@ -81,140 +213,111 @@ tabNavigatorItems(selectedTab,title,icon,selectedIcon,mark,viewContent,newPage){
                 menuPosition={'left'}     //抽屉在左侧还是右侧
                 autoClosing={true}         //默认为true 如果为true 一有事件发生抽屉就会关闭
             >
-                    <View style={styles.container3}>
-                    <LinearGradient colors={['#FFBBFF','#B0E0E6']} >
-                    <View style={styles.container}>
-                        <TouchableOpacity onPress={() => {this.setState({isOpen: true })}}>
-                         <Image style={styles.sculpture}
-                              source={require('../img/head_sculpture/6.png')}
-                         />
-                        </TouchableOpacity>
-                        <Text style={styles.title}
-                              onPress={() => {this.setState({isOpen: true })}}
-                        >
-                             我的衣柜
+                <View style={styles.container3}>
+                    <LinearGradient colors={['#FFBBFF', '#B0E0E6']} >
+                        <View style={styles.container}>
+                            <TouchableOpacity onPress={() => { this.setState({ isOpen: true }) }}>
+                                <Image style={styles.sculpture}
+                                    source={head['img' + this.state.head]}
+                                />
+                            </TouchableOpacity>
+                            <Text style={styles.title} onPress={() => { this.setState({ isOpen: true }) }} >
+                                我的衣柜
                         </Text>
-                    </View>
+                        </View>
                     </LinearGradient>
+                </View>
+                <View >
+
+                    <FlatList
+                        data={t.state.clothes}
+                        renderItem={this.renderMovie}
+                        style={{ backgroundColor: "#F5FCFF", height: height * 0.46 }}
+                        keyExtractor={item => item.id}
+                        horizontal={true}
+                    />
+
+
+                    <View style={{ backgroundColor: '#F5FCFF', height: height * 0.25, flexDirection: "row", }}>
+                        <TouchableOpacity onPress={t.choosePicker}>
+                            <Image source={require('../img/new.png')} style={styles.news} />
+                            <Text style={{ fontSize: 18, marginLeft: width / 6, marginTop: 7, color: '#828282' }}>选择衣服</Text>
+                        </TouchableOpacity>
+                        <View>
+                            <Image source={t.state.picture} style={styles.news}></Image>
+                            <TouchableOpacity onPress={t.addclothes} style={styles.button}>
+                                <Text style={styles.btText}>添加</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View style={{ backgroundColor: '#F5FCFF', height: height * 0.1 }}>
+                        <TabNavigator>
+                            {this.tabNavigatorItems('tb_msg', "主页", require('../img/main.png'), require('../img/mains.png'), "", "消息页面内容", 'Main')}
+                            {this.tabNavigatorItems('tb_contacts', "好友", require('../img/friend.png'), require('../img/friends.png'), "", "联系人页面内容", 'Friend')}
+                            {this.tabNavigatorItems('tb_watch', "搭配推荐", require('../img/match2.png'), require('../img/match1.png'), "", "看点页面内容", 'Match')}
+                            {this.tabNavigatorItems('tb_dynamic', "我的衣柜", require('../img/clothes1.png'), require('../img/clothes.png'), "", "动态页面内容", 'Clothes')}
+                            {this.tabNavigatorItems('tb_dyn', "消息", require('../img/message.png'), require('../img/messages.png'), "1", "动态页面内容", 'Message')}
+                        </TabNavigator>
                     </View>
 
-
-
-
-                   <View >
-                   <FlatList
-                           data = {[
-                                         {key: 'Java'},
-                                         {key: 'Android'},
-                                         {key: 'iOS'},
-                                         {key: 'Flutter'},
-                                         {key: 'React Native'},
-                                         {key: 'Kotlin'},
-                                         {key: 'An'},
-                                         {key: 'i'},
-                                         {key: 'Flut'},
-                                         {key: 'Reative'},
-                                         {key: 'Kon'}
-                                    ]}
-                           renderItem={this.renderMovie}
-                           style={{
-                                       backgroundColor: "#F5FCFF",
-                                       height:height*0.46,
-
-
-                                       }}
-                           keyExtractor={item => item.id}
-                           horizontal={true}
-                         />
-                   </View>
-                   <View style={{backgroundColor: '#F5FCFF',height:height*0.25}}>
-                    <TouchableOpacity onPress={() => alert("上传图片")}>
-                     <Image
-                                                     source={require('../img/new.png')}
-                                                     style={{width: width/3.5,
-                                                                           height: width/3.5,
-                                                                           margin: 10,
-                                                              alignSelf:"center"}}
-                                                     />
-                                                       <Text style={{ fontSize: 18,
-                                                                             textAlign: 'center'}}>添加衣服</Text>
-                                                  </TouchableOpacity>
-                   </View>
-
-                   <View style={{backgroundColor: '#F5FCFF',height:height*0.1}}>
-                                             <TabNavigator>
-                                                {this.tabNavigatorItems('tb_msg',"主页",require('../img/main.png'),require('../img/mains.png'),"","消息页面内容",'Main')}
-                                                {this.tabNavigatorItems('tb_contacts',"好友",require('../img/friend.png'),require('../img/friends.png'),"","联系人页面内容",'Friend')}
-                                                {this.tabNavigatorItems('tb_watch',"搭配推荐",require('../img/match2.png'),require('../img/match1.png'),"","看点页面内容",'Match')}
-                                                {this.tabNavigatorItems('tb_dynamic',"我的衣柜",require('../img/clothes1.png'),require('../img/clothes.png'),"","动态页面内容",'Clothes')}
-                                                {this.tabNavigatorItems('tb_dyn',"消息",require('../img/message.png'),require('../img/messages.png'),"1","动态页面内容",'Message')}
-                                             </TabNavigator>
-                                          </View>
+                </View>
             </SideMenu>
         );
     }
-      renderMovie({ item }) {
-
-        // { item }是一种“解构”写法，请阅读ES2015语法的相关文档
-        // item也是FlatList中固定的参数名，请阅读FlatList的相关文档
+    renderMovie({ item }) {
+        let t = this;
+        let img = { uri: item.picture }
         return (
-          <View >
-                           <Image
-                                 source={require('../img/test1.jpg')}
-                                 style={styles.thumbnail}
-                                 />
-                                 <View style={{flexDirection: 'row'}}>
-                                 <TouchableOpacity onPress={() => alert("喜欢")}>
-                                 <Image style={{width:20, height:20,marginLeft:width/2.85,marginTop:5}} source={require('../img/like1.png')}/>
-                                  </TouchableOpacity>
-                                  <TouchableOpacity onPress={() => alert("删除")}>
-                                 <Image style={{width:20, height:20,marginLeft:10,marginTop:5}} source={require('../img/delete.png')}/>
-                                 </TouchableOpacity>
-                                 </View>
-          </View>
+            <View >
+                <Image source={img} style={styles.thumbnail} />
+                <View style={{ flexDirection: 'row' }}>
+                    <TouchableOpacity onPress={() => alert("喜欢")}>
+                        <Image style={{ width: 20, height: 20, marginLeft: width / 2.85, marginTop: 5 }} source={require('../img/like1.png')} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={t.deleteclothes.bind(t, item.id)}>
+                        <Image style={{ width: 20, height: 20, marginLeft: 10, marginTop: 5 }} source={require('../img/delete.png')} />
+                    </TouchableOpacity>
+                </View>
+            </View>
         );
-      }
+    }
 }
 
 
 const styles = StyleSheet.create({
-    sculpture:{
-        width:35,
-        height:35,
-        marginLeft:5,
-        marginTop:5
+    sculpture: {
+        width: 35,
+        height: 35,
+        marginLeft: 5,
+        marginTop: 5
     },
-    sculpture2:{
-            width:55,
-            height:55,
-            marginLeft:5,
-            marginTop:30
-        },
+    sculpture2: {
+        width: 55,
+        height: 55,
+        marginLeft: 5,
+        marginTop: 30
+    },
     container: {
         marginTop: 0,
         width: width,
         height: 45,
-        flexDirection:'row',
-
-
+        flexDirection: 'row',
     },
     container2: {
-            marginTop: 0,
-            width: width,
-            height: 150,
-            flexDirection:'row',
-            backgroundColor: '#00BFFF'
-        },
+        marginTop: 0,
+        width: width,
+        height: 150,
+        flexDirection: 'row',
+    },
     container3: {
-            flex: 1,
-            backgroundColor: '#F5FCFF',
-             height: 45,
-        },
+        flex: 1,
+        backgroundColor: '#F5FCFF',
+        height: 45,
+    },
     container4: {
-                marginTop: 0,
-                width: width,
-                height: height-150,
-                backgroundColor: '#B0C4DE'
+        marginTop: 0,
+        width: width,
+        height: height - 150
     },
     welcome: {
         fontSize: 20,
@@ -227,36 +330,55 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#F5FCFF"
-      },
-      rightContainer: {
+    },
+    rightContainer: {
         flex: 1
-      },
-      username: {
+    },
+    username: {
         fontSize: 15,
         marginBottom: 5,
+    },
+    dynamic: {
+        fontSize: 10
+    },
+    myImage: {
+        width: 24,
+        height: 22,
+    },
+    thumbnail: {
+        width: width / 2.2,
+        height: width / 1.45,
+        marginLeft: 10,
+        borderRadius: 8,
+    },
+    title: {
+        fontSize: 28,
+        color: '#FFFFFF',
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlignVertical: 'center',
+        marginLeft: width / 3.6
+    },
+    news: {
+        width: width / 3,
+        height: width / 3,
+        marginBottom: 5,
+        marginLeft: width / 9
 
-      },
-      dynamic: {
-       fontSize: 10
-      },
-
-      myImage:{
-                    width:24,
-                    height:22,
-                },
-      thumbnail: {
-              width: width/2.2,
-              height: width/1.45,
-              marginLeft: 10,
-              borderRadius:8,
-            },
-      title:{
-              fontSize: 28,
-              color:'#FFFFFF',
-              textAlign: 'center',
-              alignItems:'center',
-              justifyContent:'center',
-              textAlignVertical:'center',
-              marginLeft:width/3.6
-                                  }
+    },
+    button: {
+        height: 35,
+        width: 70,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 8,
+        backgroundColor: '#87CEFA',
+        marginLeft: width / 5.8,
+        marginRight: 20
+    },
+    btText: {
+        color: '#fff',
+        fontSize: 18,
+    },
 });
