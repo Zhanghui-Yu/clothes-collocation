@@ -36,7 +36,8 @@ public class CommunityController {
     public List<JSONObject> findCommunity(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
         int uid = Integer.parseInt(request.getParameter("uid"));
-        return communityService.findCommunity(uid);
+        int times = Integer.parseInt(request.getParameter("times"));
+        return communityService.findCommunity(uid,times);
     }
 
     @PostMapping(value = "/addCommunity", produces = "application/json;charset=UTF-8")
@@ -46,7 +47,8 @@ public class CommunityController {
         int senderUid = Integer.parseInt(request.getParameter("senderUid"));
         String time = request.getParameter("time");
         String picture = request.getParameter("picture");
-        communityService.addCommunity(senderUid,time,picture);
+        String text = request.getParameter("text");
+        communityService.addCommunity(senderUid,time,picture,text);
         return 1;
     }
 
@@ -55,19 +57,8 @@ public class CommunityController {
     public JSONObject findCommunityById(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
         String id = request.getParameter("id");
-        return communityService.findCommunityById(id);
-    }
-
-    @PostMapping(value = "/show")
-    public String show(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        System.out.println(1);
-        //   response.setContentType("image/jpeg");
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        String id = request.getParameter("id");
-        String base64 = communityService.findCommunityById(id).getString("picture");
-        return base64;
-
+        int uid = Integer.parseInt(request.getParameter("uid"));
+        return communityService.findCommunityById(id,uid);
     }
 
     @PostMapping(value = "/updateLike", produces = "application/json;charset=UTF-8")
@@ -85,7 +76,43 @@ public class CommunityController {
         response.setHeader("Access-Control-Allow-Origin", "*");
         String id = request.getParameter("id");
         String account = request.getParameter("account");
-        String content = request.getParameter("content");
-        return communityService.addComment(id,account,content);
+        String message = request.getParameter("message");
+        return communityService.addComment(id,account,message);
+    }
+
+    @PostMapping(value = "/markPoint", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public double markPoint (HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        String id = request.getParameter("id");
+        int uid = Integer.parseInt(request.getParameter("uid"));
+        int point = Integer.parseInt(request.getParameter("point"));
+        return communityService.markPoint(point,id,uid);
+    }
+
+    @PostMapping(value = "/deleteCommunity", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public int deleteCommunity (HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        String id = request.getParameter("id");
+        return communityService.deleteCommunity(id);
+    }
+
+    @PostMapping(value = "/findCommunityBySenderUid", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public List<JSONObject> findCommunityBySenderUid (HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        int senderUid = Integer.parseInt(request.getParameter("senderUid"));
+        int times = Integer.parseInt(request.getParameter("times"));
+        return communityService.findCommunityBySenderUid(senderUid, times);
+    }
+
+    @PostMapping(value = "/findCommunityByText", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public List<JSONObject> findCommunityByText(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        int uid = Integer.parseInt(request.getParameter("uid"));
+        String text = request.getParameter("text");
+        return communityService.findCommunityByText(uid, text);
     }
 }

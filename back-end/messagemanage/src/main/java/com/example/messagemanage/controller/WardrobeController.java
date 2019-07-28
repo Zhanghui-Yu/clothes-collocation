@@ -39,9 +39,17 @@ public class WardrobeController {
     @ResponseBody
     public int updateWardrobe(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
-        System.out.println(1);
         String id = request.getParameter("id");
         return wardrobeService.updateWardrobeLike(id);
+    }
+
+    @PostMapping(value = "/updateWardrobeTag", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public int updateWardrobeTag(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        String id = request.getParameter("id");
+        String tag = request.getParameter("tag");
+        return wardrobeService.updateWardrobeTag(id,tag);
     }
 
     @PostMapping(value = "/deleteWardrobe", produces = "application/json;charset=UTF-8")

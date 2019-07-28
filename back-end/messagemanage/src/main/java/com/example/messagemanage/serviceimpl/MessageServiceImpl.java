@@ -7,6 +7,7 @@ import com.example.messagemanage.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -21,7 +22,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<Message> findByRecipient(String recipient) {
-        return messageRepository.findByRecipient(recipient);
+        List <Message> messages = messageRepository.findByRecipient(recipient);
+        Collections.reverse(messages);
+        return messages;
     }
 
     @Override
@@ -31,12 +34,19 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public int deleteMessage(String id){
+        messageRepository.deleteById(id);
+        return 1;
+    }
+
+    @Override
     public void addInvitation(String sender, String recipient, String time){
         Message message = messageRepository.findBySenderAndRecipientAndContent(sender,recipient,"");
         if(message == null) {
-            message = new Message(sender, recipient, time);
+            message = new Message(sender, recipient, "",time);
             messageRepository.save(message);
-        }else{
+        }
+        else{
             message.setTime(time);
             messageRepository.save(message);
         }
@@ -47,14 +57,18 @@ public class MessageServiceImpl implements MessageService {
         if(flag!=1){
             messageRepository.deleteById(id);
             return -1;
-        }else{
+        }
+        else{
             Message message = messageRepository.findById(id).get();
             String sender = message.getSender();
             String recipient = message.getRecipient();
             feignService.addFriend(sender,recipient);
+            Message tmp = messageRepository.findBySenderAndRecipientAndContent(recipient,sender,"");
+            if(tmp != null){
+                messageRepository.delete(tmp);
+            }
             messageRepository.deleteById(id);
             return 1;
         }
     }
-
 }
