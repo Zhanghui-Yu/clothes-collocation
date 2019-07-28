@@ -10,4 +10,5 @@ public interface MessageService {
     void addMessage(String sender, String recipient, String content, String time);
     void addInvitation(String sender, String recipient,String time);
     int manageInvitation(String id,int flag);
+    int deleteMessage(String id);
 }

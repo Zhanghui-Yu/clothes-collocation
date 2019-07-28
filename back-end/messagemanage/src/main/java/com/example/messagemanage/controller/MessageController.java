@@ -3,6 +3,7 @@ package com.example.messagemanage.controller;
 import com.example.messagemanage.entity.Message;
 import com.example.messagemanage.service.FeignService;
 import com.example.messagemanage.service.MessageService;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,6 @@ public class MessageController {
         response.setHeader("Access-Control-Allow-Origin", "*");
         return messageService.findByRecipient(recipient);
     }
-
     @PostMapping(value = "/manageInvitation", produces = "application/json;charset=UTF-8")
     @ResponseBody
     public int manageInvitation(HttpServletRequest request, HttpServletResponse response) {
@@ -47,4 +47,13 @@ public class MessageController {
             messageService.addMessage(sender,recipient,content,time);
         return 1;
     }
+
+    @PostMapping(value = "/deleteMessage", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public int deleteMessage(HttpServletRequest request, HttpServletResponse response) {
+        String id = request.getParameter("id");
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        return messageService.deleteMessage(id);
+    }
+
 }

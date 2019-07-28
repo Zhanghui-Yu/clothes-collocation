@@ -16,6 +16,7 @@ public class Wardrobe {
     private String picture;
     private int like;
     private int uid;
+    String tag;
     public Wardrobe() {
     }
 
@@ -24,6 +25,7 @@ public class Wardrobe {
         this.uid = uid;
         this.picture = picture;
         this.like = 0;
+        this.tag = "未分类";
     }
 
     public String getId() { return this.id; }
@@ -40,5 +42,8 @@ public class Wardrobe {
 
     public int getUid() { return this.uid; }
     public void setUid(int uid) { this.uid = uid; }
+
+    public String getTag() { return this.tag; }
+    public void setTag(String tag) { this.tag = tag; }
 
 }

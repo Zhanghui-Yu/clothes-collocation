@@ -12,5 +12,5 @@ public interface FeignService {
     JSONObject getUserInfo(@RequestParam(value = "uid") String uid);
 
     @RequestMapping(value = "/addFriend",method = RequestMethod.POST)
-    void addFriend(@RequestParam(value = "sender") String sender,@RequestParam(value = "sender") String recipient);
+    void addFriend(@RequestParam(value = "sender") String sender,@RequestParam(value = "recipient") String recipient);
 }

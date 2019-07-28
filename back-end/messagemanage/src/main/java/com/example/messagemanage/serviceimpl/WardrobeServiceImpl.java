@@ -52,5 +52,11 @@ public class WardrobeServiceImpl implements WardrobeService {
         return 1;
     }
 
-
+    @Override
+    public int updateWardrobeTag(String id, String tag){
+        Wardrobe wardrobe = wardrobeRepository.findById(id).get();
+        wardrobe.setTag(tag);
+        wardrobeRepository.save(wardrobe);
+        return 1;
+    }
 }
