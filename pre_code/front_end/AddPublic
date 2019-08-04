@@ -1,0 +1,180 @@
+import React, { Component } from 'react';
+import http from "./http";
+import {
+    StyleSheet,
+    Text,
+    View,
+    TouchableOpacity,
+    TextInput,
+    Alert,
+    Button,
+    Dimensions,
+    Image,
+    Animated,
+    ImageBackground,
+    ScrollView,
+    AsyncStorage,
+    TouchableHighlight,
+} from 'react-native';
+import head from './head';
+import ImagePicker from 'react-native-image-picker';
+import DeviceStorage from './DeviceStorage';
+const { width, height } = Dimensions.get('window');
+const photoOptions = {
+    title: '请选择',
+    quality: 0.8,
+    cancelButtonTitle: '取消',
+    takePhotoButtonTitle: '拍照',
+    chooseFromLibraryButtonTitle: '选择相册',
+    allowsEditing: true,
+    noData: false,
+    storageOptions: {
+        skipBackup: true,
+        path: 'images'
+    }
+};
+
+export default class ThirdPage extends Component<Props> {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            uid: '',
+            picture: '',
+
+        };
+        this.choosePicker = this.choosePicker.bind(this)
+    }
+    choosePicker() {
+        ImagePicker.showImagePicker(photoOptions, (response) => {
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            }
+            else if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            }
+            else if (response.customButton) {
+                console.log('User tapped custom button: ', response.customButton);
+            }
+            else {
+                // let source = { uri: response.uri };
+                // You can also display the image using data:
+                let source = { uri: 'data:image/jpeg;base64,' + response.data };
+                this.setState({
+                    picture: source
+                });
+
+
+            }
+        });
+    }
+    getmyDate() {
+        var date = new Date();
+        var year = date.getFullYear().toString();
+        var month = (date.getMonth() + 1).toString();
+        var day = date.getDate().toString();
+        var hour = date.getHours().toString();
+        var minute = date.getMinutes().toString();
+
+        return year + '年' + month + '月' + day + '日' + ' ' + hour + ':' + minute;
+    };
+
+
+
+    publish = () => {
+        if (this.state.picture != '') {
+            var date = this.getmyDate();
+            let value = {
+                senderUid: this.state.uid,
+                picture: this.state.picture.uri,
+                time: date
+            }
+            let t = this;
+            http.postimg('http://192.168.137.1:8763/addCommunity', value)
+                .then(function (data) {
+                    window.alert("发布成功！");
+                    t.props.navigation.navigate('Main', { message: 'Main' });
+                })
+                .catch(err => console.log(err));
+        } else {
+            Alert.alert("请选择图片！");
+        }
+    };
+    componentWillMount() {
+        DeviceStorage.get('login').then((uid) => {
+            this.setState({ uid: uid })
+        });
+    }
+
+    render() {
+        let t = this;
+        return (
+            <ScrollView >
+                <ImageBackground style={{ flex: 1 }} source={require('../img/background.jpg')}>
+
+                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                        <View style={styles.titleBackground}>
+                            <Text style={styles.title}>分享</Text>
+                        </View>
+                        <Text style={{ fontSize: 20, marginTop: 20, color: '#363636' }}>让世界发现你的美！</Text>
+                        <View style={{ height: 518 }}>
+                            <TouchableOpacity onPress={t.choosePicker}>
+                                <Image source={require('../img/new2.png')} style={styles.news} />
+                                <Text style={{ fontSize: 18, textAlign: 'center', color: '#828282' }}>选择图片</Text>
+                            </TouchableOpacity>
+                            <Image source={t.state.picture} style={styles.picture}></Image>
+                            <TouchableOpacity onPress={this.publish} style={styles.button}>
+                                <Text style={styles.btText}>发布</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                    </View>
+                </ImageBackground>
+            </ScrollView>
+        );
+    }
+}
+
+const styles = StyleSheet.create({
+
+    titleBackground: {
+        width: 400,
+        height: 50,
+        backgroundColor: '#4682B4'
+    },
+    title: {
+        fontSize: 28,
+        textAlign: 'center',
+        margin: 10,
+        color: '#FFFFFF'
+    },
+
+    button: {
+        height: 50,
+        width: 280,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 8,
+        backgroundColor: '#4682B4',
+        marginTop: 20
+    },
+    btText: {
+        color: '#fff',
+        fontSize: 20,
+    },
+    news: {
+        width: width / 3,
+        height: width / 3,
+        margin: 5,
+        marginTop: 20,
+        alignSelf: "center"
+    },
+    picture: {
+        width: width / 1.8,
+        height: width / 1.45,
+        margin: 5,
+        marginTop: 20,
+        alignSelf: "center"
+    }
+
+});

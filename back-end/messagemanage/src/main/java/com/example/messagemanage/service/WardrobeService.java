@@ -11,4 +11,5 @@ public interface WardrobeService {
     int deleteWardrobe(String id);
     int updateWardrobeLike(String id);
     int addWardrobe(int uid, String time, String picture);
+    int updateWardrobeTag(String id, String tag);
 }
