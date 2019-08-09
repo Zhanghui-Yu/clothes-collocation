@@ -1,0 +1,310 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: CommunityServiceImpl</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.example.messagemanage.serviceimpl</a> ]
+</div>
+
+<h1>Coverage Summary for Class: CommunityServiceImpl (com.example.messagemanage.serviceimpl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CommunityServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (155/ 155)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.example.messagemanage.serviceimpl;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.example.messagemanage.entity.Community;
+<i>4</i>&nbsp;import com.example.messagemanage.entity.Message;
+<i>5</i>&nbsp;import com.example.messagemanage.repository.CommunityRepository;
+<i>6</i>&nbsp;import com.example.messagemanage.repository.MessageRepository;
+<i>7</i>&nbsp;import com.example.messagemanage.service.CommunityService;
+<i>8</i>&nbsp;import com.example.messagemanage.service.FeignService;
+<i>9</i>&nbsp;import com.example.messagemanage.service.MessageService;
+<i>10</i>&nbsp;import net.sf.json.JSONObject;
+<i>11</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i>12</i>&nbsp;import org.springframework.stereotype.Service;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;import java.math.RoundingMode;
+<i>15</i>&nbsp;import java.text.DecimalFormat;
+<i>16</i>&nbsp;import java.util.*;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;@Service
+<b class="fc"><i>19</i>&nbsp;public class CommunityServiceImpl implements CommunityService {</b>
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    @Autowired
+<i>23</i>&nbsp;    private CommunityRepository communityRepository;
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;    @Autowired
+<i>26</i>&nbsp;    private FeignService feignService;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    @Override
+<i>29</i>&nbsp;    public List&lt;JSONObject&gt; findCommunity(int uid, int times){
+<b class="fc"><i>30</i>&nbsp;        List&lt;Community&gt; communities = communityRepository.findAll();</b>
+<b class="fc"><i>31</i>&nbsp;        if(communities.size() &lt;= times*5){</b>
+<b class="fc"><i>32</i>&nbsp;            List&lt;JSONObject&gt; result = new ArrayList&lt;JSONObject&gt;();</b>
+<b class="fc"><i>33</i>&nbsp;            JSONObject jsonObject = new JSONObject();</b>
+<b class="fc"><i>34</i>&nbsp;            jsonObject.put(&quot;flag&quot;,&quot;Not Found&quot;);</b>
+<b class="fc"><i>35</i>&nbsp;            result.add(jsonObject);</b>
+<b class="fc"><i>36</i>&nbsp;            System.out.println(&quot;Not Found&quot;);</b>
+<b class="fc"><i>37</i>&nbsp;            return result;</b>
+<i>38</i>&nbsp;        }
+<b class="fc"><i>39</i>&nbsp;        int end = communities.size()&lt;(times+1)*5? communities.size():(times+1)*5;</b>
+<b class="fc"><i>40</i>&nbsp;        Collections.reverse(communities);</b>
+<b class="fc"><i>41</i>&nbsp;        communities = communities.subList(times*5,end);</b>
+<b class="fc"><i>42</i>&nbsp;        List&lt;JSONObject&gt; result = new ArrayList&lt;JSONObject&gt;();</b>
+<b class="fc"><i>43</i>&nbsp;        Iterator&lt;Community&gt; it = communities.iterator();</b>
+<b class="fc"><i>44</i>&nbsp;        while (it.hasNext()) {</b>
+<b class="fc"><i>45</i>&nbsp;            Community community = (Community) it.next();</b>
+<b class="fc"><i>46</i>&nbsp;            int uidTmp = community.getSenderUid();</b>
+<b class="fc"><i>47</i>&nbsp;            JSONObject user = feignService.getUserInfo(String.valueOf(uidTmp));</b>
+<b class="fc"><i>48</i>&nbsp;            JSONObject jsonObject = new JSONObject();</b>
+<b class="fc"><i>49</i>&nbsp;            jsonObject.put(&quot;id&quot;,community.getId());</b>
+<b class="fc"><i>50</i>&nbsp;            jsonObject.put(&quot;flag&quot;,&quot;Found&quot;);</b>
+<b class="fc"><i>51</i>&nbsp;            jsonObject.put(&quot;isClothes&quot;, community.getIsClothes());</b>
+<b class="fc"><i>52</i>&nbsp;            jsonObject.put(&quot;picture&quot;,community.getPicture());</b>
+<b class="fc"><i>53</i>&nbsp;            jsonObject.put(&quot;text&quot;, community.getText());</b>
+<b class="fc"><i>54</i>&nbsp;            jsonObject.put(&quot;likeFlag&quot;,community.getLikeList().contains(uid));</b>
+<b class="fc"><i>55</i>&nbsp;            jsonObject.put(&quot;point&quot;,community.getPoint());</b>
+<b class="fc"><i>56</i>&nbsp;            jsonObject.put(&quot;like&quot;, community.getLikeList().size());</b>
+<b class="fc"><i>57</i>&nbsp;            jsonObject.put(&quot;comment&quot;,community.getCommentList().size());</b>
+<b class="fc"><i>58</i>&nbsp;            jsonObject.put(&quot;headPicture&quot;, user.get(&quot;picture&quot;));</b>
+<b class="fc"><i>59</i>&nbsp;            jsonObject.put(&quot;account&quot;, user.get(&quot;account&quot;));</b>
+<b class="fc"><i>60</i>&nbsp;            jsonObject.put(&quot;time&quot;,community.getTime());</b>
+<b class="fc"><i>61</i>&nbsp;            result.add(jsonObject);</b>
+<b class="fc"><i>62</i>&nbsp;        }</b>
+<b class="fc"><i>63</i>&nbsp;        System.out.println(&quot;Found&quot;);</b>
+<b class="fc"><i>64</i>&nbsp;        return result;</b>
+<i>65</i>&nbsp;    }
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;    @Override
+<i>68</i>&nbsp;    public void addCommunity(int senderUid, String time, String picture,String text, int isClothes){
+<b class="fc"><i>69</i>&nbsp;        Community community = new Community(senderUid,time,picture,text,isClothes);</b>
+<b class="fc"><i>70</i>&nbsp;        communityRepository.save(community);</b>
+<b class="fc"><i>71</i>&nbsp;    }</b>
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    @Override
+<i>74</i>&nbsp;    public JSONObject findCommunityById(String id, int uid){
+<b class="fc"><i>75</i>&nbsp;        Optional&lt;Community&gt; communityTmp = communityRepository.findById(id);</b>
+<b class="fc"><i>76</i>&nbsp;        JSONObject jsonObject = new JSONObject();</b>
+<b class="fc"><i>77</i>&nbsp;        if (!communityTmp.isPresent()) {</b>
+<b class="fc"><i>78</i>&nbsp;            jsonObject.put(&quot;flag&quot;,&quot;Not Found&quot;);</b>
+<b class="fc"><i>79</i>&nbsp;            System.out.println(12);</b>
+<i>80</i>&nbsp;        }
+<i>81</i>&nbsp;        else {
+<b class="fc"><i>82</i>&nbsp;            Community community = communityTmp.get();</b>
+<b class="fc"><i>83</i>&nbsp;            int uidTmp = community.getSenderUid();</b>
+<b class="fc"><i>84</i>&nbsp;            JSONObject user = feignService.getUserInfo(String.valueOf(uidTmp));</b>
+<b class="fc"><i>85</i>&nbsp;            jsonObject.put(&quot;flag&quot;,&quot;Found&quot;);</b>
+<b class="fc"><i>86</i>&nbsp;            jsonObject.put(&quot;id&quot;, community.getId());</b>
+<b class="fc"><i>87</i>&nbsp;            jsonObject.put(&quot;headPicture&quot;, user.get(&quot;picture&quot;));</b>
+<b class="fc"><i>88</i>&nbsp;            jsonObject.put(&quot;account&quot;, user.get(&quot;account&quot;));</b>
+<b class="fc"><i>89</i>&nbsp;            jsonObject.put(&quot;text&quot;, community.getText());</b>
+<b class="fc"><i>90</i>&nbsp;            jsonObject.put(&quot;picture&quot;, community.getPicture());</b>
+<b class="fc"><i>91</i>&nbsp;            jsonObject.put(&quot;isClothes&quot;, community.getIsClothes());</b>
+<b class="fc"><i>92</i>&nbsp;            jsonObject.put(&quot;like&quot;, community.getLikeList());</b>
+<b class="fc"><i>93</i>&nbsp;            jsonObject.put(&quot;likeNum&quot;, community.getLikeList().size());</b>
+<b class="fc"><i>94</i>&nbsp;            jsonObject.put(&quot;point&quot;, community.getPoint());</b>
+<b class="fc"><i>95</i>&nbsp;            jsonObject.put(&quot;likeFlag&quot;, community.getLikeList().contains(uid));</b>
+<b class="fc"><i>96</i>&nbsp;            jsonObject.put(&quot;markFlag&quot;, community.getMarkList().contains(uid));</b>
+<b class="fc"><i>97</i>&nbsp;            jsonObject.put(&quot;commentNum&quot;, community.getCommentList().size());</b>
+<b class="fc"><i>98</i>&nbsp;            jsonObject.put(&quot;comment&quot;, community.getCommentList());</b>
+<i>99</i>&nbsp;        }
+<b class="fc"><i>100</i>&nbsp;        return jsonObject;</b>
+<i>101</i>&nbsp;    }
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;    @Override
+<i>104</i>&nbsp;    public int updateLike(String id, int uid){
+<b class="fc"><i>105</i>&nbsp;        Community community = communityRepository.findById(id).get();</b>
+<b class="fc"><i>106</i>&nbsp;        List&lt;Integer&gt; likes = community.getLikeList();</b>
+<b class="fc"><i>107</i>&nbsp;        if(likes.contains(uid)){</b>
+<b class="fc"><i>108</i>&nbsp;            likes.remove((Integer)uid);</b>
+<i>109</i>&nbsp;        }
+<i>110</i>&nbsp;        else{
+<b class="fc"><i>111</i>&nbsp;            likes.add(uid);</b>
+<i>112</i>&nbsp;        }
+<b class="fc"><i>113</i>&nbsp;        community.setLikeList(likes);</b>
+<b class="fc"><i>114</i>&nbsp;        communityRepository.save(community);</b>
+<b class="fc"><i>115</i>&nbsp;        return 1;</b>
+<i>116</i>&nbsp;    }
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;    @Override
+<i>119</i>&nbsp;    public int addComment(String id, String account, String content){
+<b class="fc"><i>120</i>&nbsp;        Community community = communityRepository.findById(id).get();</b>
+<b class="fc"><i>121</i>&nbsp;        List&lt;JSONObject&gt; comments = community.getCommentList();</b>
+<b class="fc"><i>122</i>&nbsp;        JSONObject jsonObject = new JSONObject();</b>
+<b class="fc"><i>123</i>&nbsp;        jsonObject.put(&quot;account&quot;,account);</b>
+<b class="fc"><i>124</i>&nbsp;        jsonObject.put(&quot;message&quot;,content);</b>
+<b class="fc"><i>125</i>&nbsp;        comments.add(jsonObject);</b>
+<b class="fc"><i>126</i>&nbsp;        community.setCommentList(comments);</b>
+<b class="fc"><i>127</i>&nbsp;        communityRepository.save(community);</b>
+<b class="fc"><i>128</i>&nbsp;        return 1;</b>
+<i>129</i>&nbsp;    }
+<i>130</i>&nbsp;
+<i>131</i>&nbsp;    @Override
+<i>132</i>&nbsp;    public double markPoint(int point, String id, int uid){
+<b class="fc"><i>133</i>&nbsp;        Community community = communityRepository.findById(id).get();</b>
+<b class="fc"><i>134</i>&nbsp;        List&lt;Integer&gt; marks = community.getMarkList();</b>
+<b class="fc"><i>135</i>&nbsp;        if(marks.contains(uid))</b>
+<b class="fc"><i>136</i>&nbsp;            return -1;</b>
+<i>137</i>&nbsp;        else {
+<b class="fc"><i>138</i>&nbsp;            marks.add(uid);</b>
+<b class="fc"><i>139</i>&nbsp;            DecimalFormat format = new DecimalFormat(&quot;#0.##&quot;);</b>
+<b class="fc"><i>140</i>&nbsp;            format.setRoundingMode(RoundingMode.FLOOR);</b>
+<b class="fc"><i>141</i>&nbsp;            double newPoint = Double.parseDouble(format.format((community.getPoint()*marks.size()+point)/(marks.size()+1)));</b>
+<b class="fc"><i>142</i>&nbsp;            community.setPoint(newPoint);</b>
+<b class="fc"><i>143</i>&nbsp;            communityRepository.save(community);</b>
+<b class="fc"><i>144</i>&nbsp;            return newPoint;</b>
+<i>145</i>&nbsp;        }
+<i>146</i>&nbsp;    }
+<i>147</i>&nbsp;
+<i>148</i>&nbsp;    @Override
+<i>149</i>&nbsp;    public int deleteCommunity(String id){
+<b class="fc"><i>150</i>&nbsp;        communityRepository.deleteById(id);</b>
+<b class="fc"><i>151</i>&nbsp;        return 1;</b>
+<i>152</i>&nbsp;    }
+<i>153</i>&nbsp;
+<i>154</i>&nbsp;    @Override
+<i>155</i>&nbsp;    public List&lt;JSONObject&gt; findCommunityBySenderUid(int senderUid, int times){
+<b class="fc"><i>156</i>&nbsp;        List&lt;Community&gt; communities = communityRepository.findBySenderUid(senderUid);</b>
+<b class="fc"><i>157</i>&nbsp;        if(communities.size() &lt;= times*5){</b>
+<b class="fc"><i>158</i>&nbsp;            List&lt;JSONObject&gt; result = new ArrayList&lt;JSONObject&gt;();</b>
+<b class="fc"><i>159</i>&nbsp;            JSONObject jsonObject = new JSONObject();</b>
+<b class="fc"><i>160</i>&nbsp;            jsonObject.put(&quot;flag&quot;,&quot;Not Found&quot;);</b>
+<b class="fc"><i>161</i>&nbsp;            result.add(jsonObject);</b>
+<b class="fc"><i>162</i>&nbsp;            return result;</b>
+<i>163</i>&nbsp;        }
+<b class="fc"><i>164</i>&nbsp;        int end = communities.size()&lt;(times+1)*5? communities.size():(times+1)*5;</b>
+<b class="fc"><i>165</i>&nbsp;        Collections.reverse(communities);</b>
+<b class="fc"><i>166</i>&nbsp;        communities = communities.subList(times*5,end);</b>
+<b class="fc"><i>167</i>&nbsp;        List&lt;JSONObject&gt; result = new ArrayList&lt;JSONObject&gt;();</b>
+<b class="fc"><i>168</i>&nbsp;        Iterator&lt;Community&gt; it = communities.iterator();</b>
+<b class="fc"><i>169</i>&nbsp;        while (it.hasNext()) {</b>
+<b class="fc"><i>170</i>&nbsp;            Community community = (Community) it.next();</b>
+<b class="fc"><i>171</i>&nbsp;            int uidTmp = community.getSenderUid();</b>
+<b class="fc"><i>172</i>&nbsp;            JSONObject user = feignService.getUserInfo(String.valueOf(uidTmp));</b>
+<b class="fc"><i>173</i>&nbsp;            JSONObject jsonObject = new JSONObject();</b>
+<b class="fc"><i>174</i>&nbsp;            jsonObject.put(&quot;id&quot;,community.getId());</b>
+<b class="fc"><i>175</i>&nbsp;            jsonObject.put(&quot;flag&quot;,&quot;Found&quot;);</b>
+<b class="fc"><i>176</i>&nbsp;            jsonObject.put(&quot;isClothes&quot;, community.getIsClothes());</b>
+<b class="fc"><i>177</i>&nbsp;            jsonObject.put(&quot;picture&quot;,community.getPicture());</b>
+<b class="fc"><i>178</i>&nbsp;            jsonObject.put(&quot;text&quot;, community.getText());</b>
+<b class="fc"><i>179</i>&nbsp;            jsonObject.put(&quot;likeFlag&quot;,community.getLikeList().contains(senderUid));</b>
+<b class="fc"><i>180</i>&nbsp;            jsonObject.put(&quot;point&quot;,community.getPoint());</b>
+<b class="fc"><i>181</i>&nbsp;            jsonObject.put(&quot;like&quot;, community.getLikeList().size());</b>
+<b class="fc"><i>182</i>&nbsp;            jsonObject.put(&quot;comment&quot;,community.getCommentList().size());</b>
+<b class="fc"><i>183</i>&nbsp;            jsonObject.put(&quot;headPicture&quot;, user.get(&quot;picture&quot;));</b>
+<b class="fc"><i>184</i>&nbsp;            jsonObject.put(&quot;account&quot;, user.get(&quot;account&quot;));</b>
+<b class="fc"><i>185</i>&nbsp;            jsonObject.put(&quot;time&quot;,community.getTime());</b>
+<b class="fc"><i>186</i>&nbsp;            result.add(jsonObject);</b>
+<b class="fc"><i>187</i>&nbsp;        }</b>
+<b class="fc"><i>188</i>&nbsp;        return result;</b>
+<i>189</i>&nbsp;    }
+<i>190</i>&nbsp;
+<i>191</i>&nbsp;    @Override
+<i>192</i>&nbsp;    public List&lt;JSONObject&gt; findCommunityByText(int uid, String text,int times){
+<b class="fc"><i>193</i>&nbsp;        List&lt;Community&gt; communities = communityRepository.findByTextContains(text);</b>
+<b class="fc"><i>194</i>&nbsp;        if(communities.size() &lt;= times*5){</b>
+<b class="fc"><i>195</i>&nbsp;            List&lt;JSONObject&gt; result = new ArrayList&lt;JSONObject&gt;();</b>
+<b class="fc"><i>196</i>&nbsp;            JSONObject jsonObject = new JSONObject();</b>
+<b class="fc"><i>197</i>&nbsp;            jsonObject.put(&quot;flag&quot;,&quot;Not Found&quot;);</b>
+<b class="fc"><i>198</i>&nbsp;            result.add(jsonObject);</b>
+<b class="fc"><i>199</i>&nbsp;            return result;</b>
+<i>200</i>&nbsp;        }
+<b class="fc"><i>201</i>&nbsp;        int end = communities.size()&lt;(times+1)*5? communities.size():(times+1)*5;</b>
+<b class="fc"><i>202</i>&nbsp;        Collections.reverse(communities);</b>
+<b class="fc"><i>203</i>&nbsp;        communities = communities.subList(times*5,end);</b>
+<b class="fc"><i>204</i>&nbsp;        List&lt;JSONObject&gt; result = new ArrayList&lt;JSONObject&gt;();</b>
+<b class="fc"><i>205</i>&nbsp;        Iterator&lt;Community&gt; it = communities.iterator();</b>
+<b class="fc"><i>206</i>&nbsp;        while (it.hasNext()) {</b>
+<b class="fc"><i>207</i>&nbsp;            Community community = (Community) it.next();</b>
+<b class="fc"><i>208</i>&nbsp;            int uidTmp = community.getSenderUid();</b>
+<b class="fc"><i>209</i>&nbsp;            JSONObject user = feignService.getUserInfo(String.valueOf(uidTmp));</b>
+<b class="fc"><i>210</i>&nbsp;            JSONObject jsonObject = new JSONObject();</b>
+<b class="fc"><i>211</i>&nbsp;            jsonObject.put(&quot;id&quot;,community.getId());</b>
+<b class="fc"><i>212</i>&nbsp;            jsonObject.put(&quot;flag&quot;,&quot;Found&quot;);</b>
+<b class="fc"><i>213</i>&nbsp;            jsonObject.put(&quot;isClothes&quot;, community.getIsClothes());</b>
+<b class="fc"><i>214</i>&nbsp;            jsonObject.put(&quot;picture&quot;,community.getPicture());</b>
+<b class="fc"><i>215</i>&nbsp;            jsonObject.put(&quot;text&quot;, community.getText());</b>
+<b class="fc"><i>216</i>&nbsp;            jsonObject.put(&quot;likeFlag&quot;,community.getLikeList().contains(uid));</b>
+<b class="fc"><i>217</i>&nbsp;            jsonObject.put(&quot;point&quot;,community.getPoint());</b>
+<b class="fc"><i>218</i>&nbsp;            jsonObject.put(&quot;like&quot;, community.getLikeList().size());</b>
+<b class="fc"><i>219</i>&nbsp;            jsonObject.put(&quot;comment&quot;,community.getCommentList().size());</b>
+<b class="fc"><i>220</i>&nbsp;            jsonObject.put(&quot;headPicture&quot;, user.get(&quot;picture&quot;));</b>
+<b class="fc"><i>221</i>&nbsp;            jsonObject.put(&quot;account&quot;, user.get(&quot;account&quot;));</b>
+<b class="fc"><i>222</i>&nbsp;            jsonObject.put(&quot;time&quot;,community.getTime());</b>
+<b class="fc"><i>223</i>&nbsp;            result.add(jsonObject);</b>
+<b class="fc"><i>224</i>&nbsp;        }</b>
+<b class="fc"><i>225</i>&nbsp;        return result;</b>
+<i>226</i>&nbsp;    }
+<i>227</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-07-29 19:55</div>
+</div>
+</body>
+</html>
