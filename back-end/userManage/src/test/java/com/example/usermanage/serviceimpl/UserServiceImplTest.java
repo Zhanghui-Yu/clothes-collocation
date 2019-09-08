@@ -5,6 +5,7 @@ import com.example.usermanage.entity.User;
 import com.example.usermanage.repository.UserRepository;
 import com.example.usermanage.service.UserService;
 import junit.framework.TestCase;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -40,9 +41,9 @@ public class UserServiceImplTest extends TestCase {
 
     @Test
     public void testfindByAccountAndPassword() {
-        User user = userService.findByAccountAndPassword("smallqqq", "3333");
+        User user = userService.findByAccountAndPassword("smallqqq", "q");
         assertEquals(user.getUid(), 6);
-        User user2 = userService.findByAccountAndPassword("smallqq", "3333");
+        User user2 = userService.findByAccountAndPassword("smallqq", "error");
         assertEquals(-1, user2.getUid());
     }
 
@@ -95,10 +96,19 @@ public class UserServiceImplTest extends TestCase {
 
     @Test
     public void testfindAllCustomers() {
-        List<User> users = userService.findAllCustomers();
+        JSONObject jsonObject = userService.findCustomersByText(1,"smallqqq");
+        List<User> users = (List<User>) JSONArray.toCollection(jsonObject.getJSONArray("users"),User.class);
+        assertEquals(users.get(0).getAccount(), "smallqqq");
+        assertEquals(1,users.size());
+    }
+
+    @Test
+    public void testfindCustomersByText() {
+        JSONObject jsonObject = userService.findAllCustomers(1);
+        List<User> users = (List<User>) JSONArray.toCollection(jsonObject.getJSONArray("users"),User.class);
         assertEquals(users.get(0).getAccount(), "smallqqq");
         assertEquals(users.get(1).getAccount(), "gary");
-        assertEquals(users.size(),userRepository.findByRole("customer").size());
+        assertEquals(20,users.size());
     }
 
     @Test
@@ -124,18 +134,18 @@ public class UserServiceImplTest extends TestCase {
     @Test
     @Transactional
     public void testaddFriend() {
-        List<JSONObject> friend1 = userService.findFriends(6);
-        List<JSONObject> friend2 = userService.findFriends(7);
-        userService.addFriend("smallqqq","gary");
-        List<JSONObject> friend3 = userService.findFriends(6);
-        List<JSONObject> friend4 = userService.findFriends(7);
+        List<JSONObject> friend1 = userService.findFriends(26);
+        List<JSONObject> friend2 = userService.findFriends(27);
+        userService.addFriend("test1","test2");
+        List<JSONObject> friend3 = userService.findFriends(26);
+        List<JSONObject> friend4 = userService.findFriends(27);
         assertEquals(friend1.size()+1,friend3.size());
         assertEquals(friend2.size()+1,friend4.size());
-        userService.addFriend("smallqqq","gary");
-        List<JSONObject> friend5 = userService.findFriends(6);
-        List<JSONObject> friend6 = userService.findFriends(7);
-        assertEquals(friend1.size()+1,friend3.size());
-        assertEquals(friend2.size()+1,friend4.size());
+        userService.addFriend("test1","test2");
+        List<JSONObject> friend5 = userService.findFriends(26);
+        List<JSONObject> friend6 = userService.findFriends(27);
+        assertEquals(friend1.size()+1,friend5.size());
+        assertEquals(friend2.size()+1,friend6.size());
     }
 
     @Test
@@ -158,7 +168,7 @@ public class UserServiceImplTest extends TestCase {
     @Transactional
     public void testupdatePassword() {
         assertEquals(-1,userService.updatePassword(6,"2222","6666"));
-        assertEquals(1,userService.updatePassword(6,"3333","6666"));
+        assertEquals(1,userService.updatePassword(6,"q","6666"));
     }
 
     @Test

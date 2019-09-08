@@ -43,21 +43,21 @@ public class WardrobeServiceImplTest {
     @Test
     public void deleteWardrobe() {
         int size1 = wardrobeRepository.findByUid(6).size();
-        wardrobeService.deleteWardrobe("5d3a6b440172dc3a08faf5fb");
+        wardrobeService.deleteWardrobe("5d3ed48b0172dc4bc4dfe104");
         int size2 = wardrobeRepository.findByUid(6).size();
         assertEquals(size1-1,size2);
     }
 
     @Test
     public void updateWardrobeLike() {
-        Wardrobe wardrobe = wardrobeRepository.findById("5d351ad80172dc1f3c1147f9").get();
+        Wardrobe wardrobe = wardrobeRepository.findById("5d3d68d70172dc04286340e1").get();
         int like = wardrobe.getLike();
-        wardrobeService.updateWardrobeLike("5d351ad80172dc1f3c1147f9");
-        wardrobe = wardrobeRepository.findById("5d351ad80172dc1f3c1147f9").get();
+        wardrobeService.updateWardrobeLike("5d3d68d70172dc04286340e1");
+        wardrobe = wardrobeRepository.findById("5d3d68d70172dc04286340e1").get();
         int like2 = wardrobe.getLike();
         assertNotEquals(like,like2);
-        wardrobeService.updateWardrobeLike("5d351ad80172dc1f3c1147f9");
-        wardrobe = wardrobeRepository.findById("5d351ad80172dc1f3c1147f9").get();
+        wardrobeService.updateWardrobeLike("5d3d68d70172dc04286340e1");
+        wardrobe = wardrobeRepository.findById("5d3d68d70172dc04286340e1").get();
         int like3 = wardrobe.getLike();
         assertEquals(like,like3);
     }
@@ -72,8 +72,8 @@ public class WardrobeServiceImplTest {
 
     @Test
     public void updateWardrobeTag(){
-        wardrobeService.updateWardrobeTag("5d351ad80172dc1f3c1147f9","未分类");
-        Wardrobe wardrobe = wardrobeRepository.findById("5d351ad80172dc1f3c1147f9").get();
+        wardrobeService.updateWardrobeTag("5d3d68e90172dc04286340e3","未分类");
+        Wardrobe wardrobe = wardrobeRepository.findById("5d3d68e90172dc04286340e3").get();
         String tag = wardrobe.getTag();
         assertEquals("未分类",tag);
     }

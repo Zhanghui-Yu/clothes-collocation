@@ -13,10 +13,11 @@ import com.mongodb.Mongo;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import net.sf.json.JSONObject;
+import org.apdplat.word.WordSegmenter;
+import org.apdplat.word.segmentation.Word;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sun.misc.BASE64Decoder;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.FormParam;
@@ -45,10 +46,11 @@ public class CommunityController {
     public int addCommunity(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
         int senderUid = Integer.parseInt(request.getParameter("senderUid"));
+        int isClothes = Integer.parseInt(request.getParameter("isClothes"));
         String time = request.getParameter("time");
         String picture = request.getParameter("picture");
         String text = request.getParameter("text");
-        communityService.addCommunity(senderUid,time,picture,text);
+        communityService.addCommunity(senderUid,time,picture,text, isClothes);
         return 1;
     }
 
@@ -90,7 +92,7 @@ public class CommunityController {
         return communityService.markPoint(point,id,uid);
     }
 
-    @PostMapping(value = "/deleteCommunity", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/deleteCommunity", produces = "application/json;charset=UTF-8")
     @ResponseBody
     public int deleteCommunity (HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
@@ -107,12 +109,13 @@ public class CommunityController {
         return communityService.findCommunityBySenderUid(senderUid, times);
     }
 
-    @PostMapping(value = "/findCommunityByText", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/findCommunityByText", produces = "application/json;charset=UTF-8")
     @ResponseBody
     public List<JSONObject> findCommunityByText(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
         int uid = Integer.parseInt(request.getParameter("uid"));
+        int times = Integer.parseInt(request.getParameter("times"));
         String text = request.getParameter("text");
-        return communityService.findCommunityByText(uid, text);
+        return communityService.findCommunityByText(uid, text, times);
     }
 }
