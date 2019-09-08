@@ -1,0 +1,136 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: FavoriteServiceImpl</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.example.messagemanage.serviceimpl</a> ]
+</div>
+
+<h1>Coverage Summary for Class: FavoriteServiceImpl (com.example.messagemanage.serviceimpl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FavoriteServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/ 17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.example.messagemanage.serviceimpl;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.example.messagemanage.entity.Community;
+<i>4</i>&nbsp;import com.example.messagemanage.entity.Favorite;
+<i>5</i>&nbsp;import com.example.messagemanage.repository.FavoriteRepository;
+<i>6</i>&nbsp;import com.example.messagemanage.service.FavoriteService;
+<i>7</i>&nbsp;import com.example.messagemanage.service.FeignService;
+<i>8</i>&nbsp;import net.sf.json.JSONObject;
+<i>9</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i>10</i>&nbsp;import org.springframework.stereotype.Service;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;import java.util.ArrayList;
+<i>13</i>&nbsp;import java.util.Iterator;
+<i>14</i>&nbsp;import java.util.List;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;@Service
+<b class="fc"><i>17</i>&nbsp;public class FavoriteServiceImpl implements FavoriteService {</b>
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    @Autowired
+<i>21</i>&nbsp;    private FavoriteRepository favoriteRepository;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    @Autowired
+<i>24</i>&nbsp;    private FeignService feignService;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    @Override
+<i>27</i>&nbsp;    public int deleteFavorite(String id){
+<b class="fc"><i>28</i>&nbsp;        favoriteRepository.deleteById(id);</b>
+<b class="fc"><i>29</i>&nbsp;        return 1;</b>
+<i>30</i>&nbsp;    }
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    @Override
+<i>33</i>&nbsp;    public int addFavorite(int uid,String picture){
+<b class="fc"><i>34</i>&nbsp;        Favorite favorite = new Favorite(uid,picture);</b>
+<b class="fc"><i>35</i>&nbsp;        favoriteRepository.save(favorite);</b>
+<b class="fc"><i>36</i>&nbsp;        return 1;</b>
+<i>37</i>&nbsp;    }
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;    @Override
+<i>40</i>&nbsp;    public List&lt;JSONObject&gt; findFavoriteByUid(int uid){
+<b class="fc"><i>41</i>&nbsp;        List&lt;Favorite&gt; favorites = favoriteRepository.findByUid(uid);</b>
+<b class="fc"><i>42</i>&nbsp;        List&lt;JSONObject&gt; result = new ArrayList&lt;JSONObject&gt;();</b>
+<b class="fc"><i>43</i>&nbsp;        Iterator&lt;Favorite&gt; it = favorites.iterator();</b>
+<b class="fc"><i>44</i>&nbsp;        while (it.hasNext()) {</b>
+<b class="fc"><i>45</i>&nbsp;            Favorite favorite = (Favorite) it.next();</b>
+<b class="fc"><i>46</i>&nbsp;            JSONObject jsonObject = new JSONObject();</b>
+<b class="fc"><i>47</i>&nbsp;            jsonObject.put(&quot;id&quot;,favorite.getId());</b>
+<b class="fc"><i>48</i>&nbsp;            jsonObject.put(&quot;picture&quot;,favorite.getPicture());</b>
+<b class="fc"><i>49</i>&nbsp;            result.add(jsonObject);</b>
+<b class="fc"><i>50</i>&nbsp;        }</b>
+<b class="fc"><i>51</i>&nbsp;        return result;</b>
+<i>52</i>&nbsp;    }
+<i>53</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-07-29 19:55</div>
+</div>
+</body>
+</html>

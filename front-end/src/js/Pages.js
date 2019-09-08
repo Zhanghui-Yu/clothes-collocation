@@ -15,13 +15,8 @@ import ChangePassword from './ChangePassword';
 import ChangeInformation from './ChangeInformation';
 import AddFriend from './AddFriend';
 import AddPublic from './AddPublic';
+import FriendInfo from './FriendInfo';
 import SendMessage from './SendMessage';
-import SpecificMessage from './SpecificMessage';
-import Application from './Application';
-import Favorite from './Favorite';
-import test from './test';
-import Btn from './Btn';
-import MyMain from './MyMain';
 import {
     createAppContainer,
     createStackNavigator
@@ -29,42 +24,37 @@ import {
 
 
 
-export default class Pages extends Component {
-    constructor(props) {
+export default class Pages extends Component{
+    constructor(props){
         super(props);
     }
-    render() {
-        return (
-            <SimpleAppNavigator />
+    render(){
+        return(
+            <SimpleAppNavigator/>
         )
     }
 };
 
-const SimpleAppNavigator = createAppContainer(createStackNavigator({
-    Main: { screen: Main },
-    Register: { screen: Register },
-    Login: { screen: Login },
-    Match: { screen: Match },
-    Message: { screen: Message },
-    Clothes: { screen: Clothes },
-    Friend: { screen: Friend },
-    BottomNavigation: { screen: BottomNavigation },
-    Clothesmatch: { screen: Clothesmatch },
-    MainDetail: { screen: MainDetail },
-    ChangeHead: { screen: ChangeHead },
-    ChangeInformation: { screen: ChangeInformation },
-    ChangePassword: { screen: ChangePassword },
-    AddFriend: { screen: AddFriend },
-    AddPublic: { screen: AddPublic },
-    SendMessage: { screen: SendMessage },
-    SpecificMessage: { screen: SpecificMessage },
-    Application: { screen: Application },
-    Favorite: { screen: Favorite },
-    test: { screen: test },
-    Btn: { screen: Btn },
-    MyMain: { screen: MyMain }
-}, {
-        initialRouteName: 'Login',
-        headerMode: 'none'
-    }));
+const SimpleAppNavigator =createAppContainer(createStackNavigator({
+     Main: {screen: Main},
+     Register: {screen: Register},
+     Login: {screen: Login},
+     Match: {screen: Match},
+     Message: {screen: Message},
+     Clothes: {screen: Clothes},
+     Friend: {screen: Friend},
+     BottomNavigation:{screen:BottomNavigation },
+     Clothesmatch:{screen:Clothesmatch},
+     MainDetail:{screen:MainDetail},
+     ChangeHead:{screen:ChangeHead},
+     ChangeInformation:{screen:ChangeInformation},
+     ChangePassword:{screen:ChangePassword},
+     AddFriend:{screen:AddFriend},
+     AddPublic:{screen:AddPublic},
+     FriendInfo:{screen:FriendInfo},
+     SendMessage:{screen:SendMessage}
+},{
+     initialRouteName: 'Main',
+     headerMode:'none'
+ }));
 

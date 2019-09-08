@@ -1,6 +1,6 @@
 import React, {
     AsyncStorage
-} from 'react-native';
+}from 'react-native';
 
 class DeviceStorage {
     /**
