@@ -40,6 +40,7 @@ public class MessageController {
         String recipient = request.getParameter("recipient");
         String content = request.getParameter("content");
         String time = request.getParameter("time");
+        System.out.println(1);
         response.setHeader("Access-Control-Allow-Origin", "*");
         if(content.equals(""))
             messageService.addInvitation(sender,recipient,time);

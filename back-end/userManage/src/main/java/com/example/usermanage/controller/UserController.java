@@ -1,6 +1,7 @@
 package com.example.usermanage.controller;
 
 import com.example.usermanage.entity.User;
+import com.example.usermanage.repository.UserRepository;
 import com.example.usermanage.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-
     @PostMapping(value = "/findUser", produces = "application/json;charset=UTF-8")
     @ResponseBody
     public User findUser(HttpServletRequest request, HttpServletResponse response) {
@@ -28,11 +28,21 @@ public class UserController {
         return tmp;
     }
 
-    @PostMapping(value = "/findAllCustomers", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/findAllCustomers", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public List<User> findAllCustomer(HttpServletRequest request, HttpServletResponse response) {
+    public JSONObject findAllCustomer(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
-        return userService.findAllCustomers();
+        int page = Integer.parseInt(request.getParameter("page"));
+        return userService.findAllCustomers(page);
+    }
+
+    @RequestMapping(value = "/findCustomersByText", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public JSONObject findCustomerByText(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        int page = Integer.parseInt(request.getParameter("page"));
+        String text = request.getParameter("text");
+        return userService.findCustomersByText(page,text);
     }
 
     @PostMapping(value = "/updateState", produces = "application/json;charset=UTF-8")
@@ -43,7 +53,7 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "/addUser", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/addUser", produces = "application/json;charset=UTF-8")
     @ResponseBody
     public int addUser(HttpServletRequest request, HttpServletResponse response) {
         String account = request.getParameter("account");

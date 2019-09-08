@@ -14,7 +14,9 @@ public interface UserService {
 
     int addUser(String account, String password, String phone);
 
-    List<User> findAllCustomers();
+    JSONObject findAllCustomers(int page);
+
+    JSONObject findCustomersByText(int page, String text);
 
     String updateState(int uid);
 

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -82,8 +83,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAllCustomers() {
-        return userRepository.findByRole("customer");
+    public JSONObject findAllCustomers(int page) {
+        List<User> users = userRepository.findByRole("customer");
+        int pages = users.size()/20 + 1;
+        int end = users.size()<page*20? users.size():page*20;
+        users = users.subList((page-1)*20,end);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("users",users);
+        jsonObject.put("pages",pages);
+        return jsonObject;
+    }
+
+    @Override
+    public JSONObject findCustomersByText(int page, String text) {
+        List<User> users = userRepository.findByRoleAndAccountContains("customer",text);
+        int pages = users.size()/20 + 1;
+        int end = users.size()<page*20? users.size():page*20;
+        users = users.subList((page-1)*20,end);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("users",users);
+        jsonObject.put("pages",pages);
+        return jsonObject;
     }
 
     @Override

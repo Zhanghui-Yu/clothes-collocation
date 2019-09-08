@@ -35,7 +35,7 @@ public class FavoriteServiceImplTest {
     @Test
     public void deleteFavorite() {
         int size1 = favoriteRepository.findAll().size();
-        favoriteService.deleteFavorite("5d3a5ee20172dc3b247d6823");
+        favoriteService.deleteFavorite("5d3d686b0172dc04286340d9");
         int size2 = favoriteRepository.findAll().size();
         assertEquals(size1 - 1, size2);
     }
