@@ -14,6 +14,7 @@ public class Community {
     private String id;
     private int senderUid;
     private String time;
+    private int isClothes;
     private String picture;
     private String text;
     private List<Integer> likeList;
@@ -24,7 +25,7 @@ public class Community {
     public Community() {
     }
 
-    public Community(int senderUid, String time, String picture,String text) {
+    public Community(int senderUid, String time, String picture,String text, int isClothes) {
         this.senderUid = senderUid;
         this.time = time;
         this.picture = picture;
@@ -32,6 +33,7 @@ public class Community {
         this.markList = new ArrayList<Integer>();
         this.text = text;
         this.point = 90.00;
+        this.isClothes = isClothes;
         this.commentList = new ArrayList<JSONObject>();
     }
 
@@ -40,6 +42,9 @@ public class Community {
 
     public int getSenderUid() { return this.senderUid; }
     public void setSenderUid(int senderUid) { this.senderUid = senderUid; }
+
+    public int getIsClothes() { return this.isClothes; }
+    public void setIsClothes(int isClothes) { this.isClothes = isClothes; }
 
     public double getPoint() { return this.point; }
     public void setPoint(double point) { this.point = point; }

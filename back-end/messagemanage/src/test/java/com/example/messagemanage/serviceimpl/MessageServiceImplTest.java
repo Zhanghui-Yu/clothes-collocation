@@ -47,6 +47,14 @@ public class MessageServiceImplTest {
     }
 
     @Test
+    public void deleteMessage() {
+        int size1 = messageRepository.findAll().size();
+        messageService.deleteMessage("5d3d6baf0172dc04286340f3");
+        int size2 =  messageRepository.findAll().size();
+        assertEquals(size1-1,size2);
+    }
+
+    @Test
     public void addInvitation() {
         int size1 = messageRepository.findByRecipient("Gary").size();
         messageService.addInvitation("Gggg","Gary","2019年7月18日 16:29");
@@ -61,9 +69,9 @@ public class MessageServiceImplTest {
 
     @Test
     public void manageInvitation() {
-        messageService.manageInvitation("5d3a71a98582cf1dd4b12c54",-1);
+        messageService.manageInvitation("5d3ed34206660f0b68f36048",-1);
         assertNull(messageRepository.findBySenderAndRecipientAndContent("test1","test3",""));
-        messageService.manageInvitation("5d3a71988582cf1dd4b12c52",1);
+        messageService.manageInvitation("5d3ed33b06660f0b68f36047",1);
         assertNull(messageRepository.findBySenderAndRecipientAndContent("test1","test2",""));
     }
 }
